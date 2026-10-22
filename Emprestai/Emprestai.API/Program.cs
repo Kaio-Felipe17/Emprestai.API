@@ -1,3 +1,5 @@
+using Emprestai.API.Errors;
+using Emprestai.Application.Behaviors;
 using Emprestai.Application.Loans.Create;
 using Emprestai.Application.Mappings;
 using Emprestai.Application.Repositories;
@@ -19,8 +21,15 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+
 #region MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateLoanHandler).Assembly));
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(CreateLoanHandler).Assembly);
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
 #endregion
 
 #region Repositories
@@ -38,6 +47,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateLoanValidator>();
 #endregion
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

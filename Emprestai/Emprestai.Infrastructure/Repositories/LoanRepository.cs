@@ -15,7 +15,7 @@ public class LoanRepository(ApiDbContext context) : BaseRepository<Loan>(context
           .AnyAsync(x =>
               x.PersonId == personId &&
               x.ReturnedAt == null &&
-              x.DueAt < DateTime.Now);
+              x.DueAt < DateTime.UtcNow);
     }
 
     public async Task<bool> IsItemBorrowedAsync(Guid itemId) 

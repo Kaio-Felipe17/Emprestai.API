@@ -34,13 +34,11 @@ public class CreateLoanHandler(
         if (isItemBorrowed)
             throw new ItemAlreadyBorrowedException("Esse item já foi emprestado.");
 
-        if (command.DueAt <= DateTime.Now)
+        if (command.DueAt <= DateTime.UtcNow)
             throw new InvalidOperationException("O prazo devolução deve ser superior à data de empréstimo.");
 
-        var newLoan = mapper.Map<Loan>(command);
-        if (newLoan.DueAt <= newLoan.BorrowedAt)
-            throw new InvalidOperationException("O prazo devolução deve ser superior à data de empréstimo.");
-
+        var borrowedAt = DateTime.UtcNow;
+        var newLoan = new Loan(command.PersonId, command.ItemId, borrowedAt, command.DueAt);
         await loanRepository.CreateAsync(newLoan, cancellationToken);
         return mapper.Map<LoanDTO>(newLoan);
     }
