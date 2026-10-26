@@ -33,4 +33,12 @@ public class Loan : BaseEntity
 
         ReturnedAt = returnedAt;
     }
+
+    public void Delete()
+    {
+        if (!ReturnedAt.HasValue)
+            throw new InvalidOperationException("Não é possível excluir um empréstimo que ainda não foi devolvido.");
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
+    }
 }

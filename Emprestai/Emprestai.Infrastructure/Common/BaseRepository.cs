@@ -13,7 +13,7 @@ public class BaseRepository<T>(ApiDbContext context) : IRepository<T> where T : 
         => await _context.Set<T>().AsNoTracking().Where(x => !x.IsDeleted).ToListAsync(cancellationToken);
 
     public Task<T?> GetAsync(Guid id, CancellationToken cancellationToken = default)
-        => _context.Set<T>().FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken);
+        => _context.Set<T>().FirstOrDefaultAsync(entity => entity.Id == id && !entity.IsDeleted, cancellationToken);
 
     public virtual async Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default)
     {
@@ -29,7 +29,7 @@ public class BaseRepository<T>(ApiDbContext context) : IRepository<T> where T : 
         return entity;
     }
 
-    public async Task<T> DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    public virtual async Task<T> DeleteAsync(T entity, CancellationToken cancellationToken = default)
     {
         _context.Set<T>().Remove(entity);
         await _context.SaveChangesAsync(cancellationToken);

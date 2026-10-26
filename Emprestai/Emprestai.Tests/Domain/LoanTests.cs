@@ -100,4 +100,31 @@ public class LoanTests
         // Act & Assert
         Assert.Throws<ArgumentException>(() => new Loan(Guid.NewGuid(), Guid.NewGuid(), borrowedAt, dueAt));
     }
+
+    [Fact]
+    public void DeleteLoan_ShouldThrowInvalidOperationException_WhenReturnedAtIsNull()
+    {
+        // Arrange
+        var loan = new Loan(Guid.NewGuid(), Guid.NewGuid(), new DateTime(2026, 06, 10), new DateTime(2026, 06, 20));
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => loan.Delete());
+        Assert.False(loan.IsDeleted);
+        Assert.Null(loan.DeletedAt);
+    }
+
+    [Fact]
+    public void DeleteLoan_ShouldSetIsDeletedAndDeletedAt_WhenReturnedAtIsNotNull()
+    {
+        // Arrange
+        var loan = new Loan(Guid.NewGuid(), Guid.NewGuid(), new DateTime(2026, 06, 10), new DateTime(2026, 06, 20));
+        loan.Return(new DateTime(2026, 06, 18));
+
+        // Act
+        loan.Delete();
+
+        // Assert
+        Assert.True(loan.IsDeleted);
+        Assert.NotNull(loan.DeletedAt);
+    }
 }

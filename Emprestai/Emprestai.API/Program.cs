@@ -1,3 +1,4 @@
+using Emprestai.API.Endpoints;
 using Emprestai.API.Errors;
 using Emprestai.Application.Behaviors;
 using Emprestai.Application.Loans.Create;
@@ -62,5 +63,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+#region Map Endpoints
+app.MapLoanEndpoints();
+#endregion
 
 app.Run();

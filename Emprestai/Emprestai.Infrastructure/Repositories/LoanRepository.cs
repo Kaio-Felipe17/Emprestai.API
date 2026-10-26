@@ -20,4 +20,11 @@ public class LoanRepository(ApiDbContext context) : BaseRepository<Loan>(context
 
     public async Task<bool> IsItemBorrowedAsync(Guid itemId) 
         => await _context.Loans.AsNoTracking().AnyAsync(x => x.ItemId == itemId && x.ReturnedAt == null);
+
+    public override async Task<Loan> DeleteAsync(Loan loan, CancellationToken cancellationToken = default)
+    {
+        loan.Delete();
+        await _context.SaveChangesAsync(cancellationToken);
+        return loan;
+    }
 }
