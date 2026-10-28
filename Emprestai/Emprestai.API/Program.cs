@@ -5,6 +5,7 @@ using Emprestai.Application.Loans.Create;
 using Emprestai.Application.Mappings;
 using Emprestai.Application.Repositories;
 using Emprestai.Application.Validators.Loan;
+using Emprestai.Application.Validators.Person;
 using Emprestai.Infrastructure.Context;
 using Emprestai.Infrastructure.Repositories;
 using FluentValidation;
@@ -45,6 +46,7 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(LoanMappingProfile).Ass
 
 #region Validators
 builder.Services.AddValidatorsFromAssemblyContaining<CreateLoanValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreatePersonValidator>();
 #endregion
 
 var app = builder.Build();
