@@ -62,4 +62,53 @@ public class PersonTests
         Assert.Equal(expectedEmail, person.Email);
         Assert.Equal(expectedPhone, person.Phone);
     }
+
+    [Fact]
+    public void Constructor_ShouldCreatePerson_WhenNameHas100Characters()
+    {
+        // Arrange
+        var expectedName = new string('A', 100);
+        var name = $" {expectedName} ";
+
+        // Act
+        var person = new Person(name, "ana@email.com", null);
+
+        // Assert
+        Assert.Equal(expectedName, person.Name);
+        Assert.Equal("ana@email.com", person.Email);
+        Assert.Null(person.Phone);
+    }
+
+    [Fact]
+    public void Constructor_ShouldThrowArgumentException_WhenNameExceeds100Characters()
+    {
+        // Arrange
+        var name = new string('A', 101);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => new Person(name, "ana@email.com", null));
+    }
+
+    [Theory]
+    [InlineData("   ", "11911111111", null, "11911111111")]
+    [InlineData("", "11911111111", null, "11911111111")]
+    [InlineData("ana@email.com", "   ", "ana@email.com", null)]
+    [InlineData("ana@email.com", "", "ana@email.com", null)]
+    [InlineData(null, " 11911111111 ", null, "11911111111")]
+    public void Constructor_ShouldNormalizeContacts_WhenAtLeastOneIsProvided(
+        string? email,
+        string? phone,
+        string? expectedEmail,
+        string? expectedPhone)
+    {
+        // Arrange
+        var name = "John";
+
+        // Act
+        var person = new Person(name, email, phone);
+
+        // Assert
+        Assert.Equal(expectedEmail, person.Email);
+        Assert.Equal(expectedPhone, person.Phone);
+    }
 }
