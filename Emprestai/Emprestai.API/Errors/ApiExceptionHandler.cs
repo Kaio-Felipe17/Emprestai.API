@@ -13,6 +13,7 @@ public sealed class ApiExceptionHandler(IProblemDetailsService problemDetailsSer
             ItemAlreadyBorrowedException => (409, "Item já emprestado", exception.Message),
             ItemUnderMaintenanceException => (409, "Item em manutenção", exception.Message),
             PersonHasOverdueLoansException => (409, "Pessoa com empréstimos atrasados", exception.Message),
+            DuplicateDataException => (409, "Dados duplicados", exception.Message),
             ArgumentException => (400, "Dados inválidos", exception.Message),
             FluentValidation.ValidationException validation => (
                 400,

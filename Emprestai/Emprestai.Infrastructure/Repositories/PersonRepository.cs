@@ -17,7 +17,8 @@ public class PersonRepository(ApiDbContext context) : BaseRepository<Person>(con
         var hasPhone = !string.IsNullOrWhiteSpace(phone);
 
         return await context.Persons.AnyAsync(
-            x => (hasEmail && x.Email == email) ||
+            x => !x.IsDeleted &&
+                 (hasEmail && x.Email == email) ||
                  (hasPhone && x.Phone == phone),
             cancellationToken);
     }

@@ -71,6 +71,7 @@ app.MapControllers();
 
 #region Map Endpoints
 app.MapLoanEndpoints();
+app.MapPersonEndpoints();
 #endregion
 
 app.Run();

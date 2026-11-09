@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Emprestai.Application.DTOs.Person;
+using Emprestai.Application.Exceptions;
 using Emprestai.Application.Repositories;
 using Emprestai.Domain.Entities;
 using MediatR;
@@ -13,7 +14,7 @@ public class CreatePersonHandler(IPersonRepository personRepository, IMapper map
         var person = new Person(command.Name, command?.Email, command?.Phone);
 
         if (await personRepository.ExistsByEmailOrPhoneAsync(email: person?.Email, phone: person?.Phone, cancellationToken))
-            throw new InvalidOperationException("Email ou telefone já cadastrados.");
+            throw new DuplicateDataException("Email ou telefone já cadastrados.");
 
         await personRepository.CreateAsync(person, cancellationToken);
         return mapper.Map<PersonDTO>(person);
