@@ -18,8 +18,8 @@ public class PersonRepository(ApiDbContext context) : BaseRepository<Person>(con
 
         return await context.Persons.AnyAsync(
             x => !x.IsDeleted &&
-                 (hasEmail && x.Email == email) ||
-                 (hasPhone && x.Phone == phone),
+                 ((hasEmail && x.Email == email) ||
+                 (hasPhone && x.Phone == phone)),
             cancellationToken);
     }
 }
