@@ -1,6 +1,7 @@
 using Emprestai.API.Endpoints;
 using Emprestai.API.Errors;
 using Emprestai.Application.Behaviors;
+using Emprestai.Application.Items.Create;
 using Emprestai.Application.Loans.Create;
 using Emprestai.Application.Mappings;
 using Emprestai.Application.Persons.Create;
@@ -31,7 +32,6 @@ builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(CreateLoanHandler).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(CreatePersonHandler).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 #endregion
@@ -44,12 +44,10 @@ builder.Services.AddScoped<IItemRepository, ItemRepository>();
 
 #region Automapper
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(LoanMappingProfile).Assembly));
-builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(PersonMappingProfile).Assembly));
 #endregion
 
 #region Validators
 builder.Services.AddValidatorsFromAssemblyContaining<CreateLoanValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<CreatePersonValidator>();
 #endregion
 
 var app = builder.Build();
@@ -72,6 +70,7 @@ app.MapControllers();
 #region Map Endpoints
 app.MapLoanEndpoints();
 app.MapPersonEndpoints();
+app.MapItemEndpoints();
 #endregion
 
 app.Run();

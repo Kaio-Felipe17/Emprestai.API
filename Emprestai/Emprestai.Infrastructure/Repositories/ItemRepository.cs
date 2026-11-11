@@ -7,4 +7,5 @@ namespace Emprestai.Infrastructure.Repositories;
 
 public class ItemRepository(ApiDbContext context) : BaseRepository<Item>(context), IItemRepository
 {
+
 }
