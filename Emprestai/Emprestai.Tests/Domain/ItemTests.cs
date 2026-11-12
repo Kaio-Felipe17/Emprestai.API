@@ -1,11 +1,23 @@
-﻿using Emprestai.Domain.Entities;
-using System;
+﻿using AutoMapper;
+using Emprestai.Application.Items.Create;
+using Emprestai.Application.Mappings;
+using Emprestai.Application.Repositories;
+using Emprestai.Domain.Entities;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Xunit;
 
 namespace Emprestai.Tests.Domain;
 
 public class ItemTests
 {
+    private readonly Mock<IItemRepository> _itemRepositoryMock;
+
+    public ItemTests()
+    {
+        _itemRepositoryMock = new Mock<IItemRepository>();
+    }
+
     [Fact]
     public void StartMaintenance_ShouldMarkItemAsUnderMaintenance()
     {
@@ -165,5 +177,40 @@ public class ItemTests
         Assert.Equal("Item 1", item.Name);
         Assert.Equal("Descrição item 1", item.Description);
         Assert.False(item.IsUnderMaintenance);
+    }
+
+    [Fact]
+    public async Task Constructor_ShouldCreateItems_WhenTwoOrMoreItemsHaveTheSameName()
+    {
+        // Arrange
+        var configuration = new MapperConfiguration(
+            cfg => cfg.AddProfile<ItemMappingProfile>(),
+            NullLoggerFactory.Instance);
+
+        var mapper = configuration.CreateMapper();
+        var handler = new CreateItemHandler(_itemRepositoryMock.Object, mapper);
+        var command = new CreateItemCommand
+        {
+            Name = "Furadeira",
+            Description = "Furadeira de bancada"
+        };
+
+        var secondCommand = new CreateItemCommand
+        {
+            Name = "Furadeira",
+            Description = "Furadeira de bancada"
+        };
+
+        // Act
+        var result = await handler.Handle(command, CancellationToken.None);
+        var secondResult = await handler.Handle(secondCommand, CancellationToken.None);
+
+        // Assert
+        _itemRepositoryMock.Verify(
+            repo => repo.CreateAsync(
+                It.Is<Item>(item => item.Name == "Furadeira"),
+                It.IsAny<CancellationToken>()),
+            Times.Exactly(2));
+        Assert.NotEqual(result.Id, secondResult.Id);
     }
 }
