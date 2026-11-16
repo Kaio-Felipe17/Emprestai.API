@@ -183,6 +183,9 @@ public class ItemTests
     public async Task Constructor_ShouldCreateItems_WhenTwoOrMoreItemsHaveTheSameName()
     {
         // Arrange
+        var firstId = Guid.NewGuid();
+        var secondId = Guid.NewGuid();
+
         var configuration = new MapperConfiguration(
             cfg => cfg.AddProfile<ItemMappingProfile>(),
             NullLoggerFactory.Instance);
@@ -201,6 +204,18 @@ public class ItemTests
             Description = "Furadeira de bancada"
         };
 
+        var ids = new Queue<Guid>(new[] { firstId, secondId });
+
+        _itemRepositoryMock
+            .Setup(repo => repo.CreateAsync(
+                It.IsAny<Item>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Item item, CancellationToken _) =>
+            {
+                item.Id = ids.Dequeue();
+                return item;
+            });
+
         // Act
         var result = await handler.Handle(command, CancellationToken.None);
         var secondResult = await handler.Handle(secondCommand, CancellationToken.None);
@@ -211,6 +226,8 @@ public class ItemTests
                 It.Is<Item>(item => item.Name == "Furadeira"),
                 It.IsAny<CancellationToken>()),
             Times.Exactly(2));
-        Assert.NotEqual(result.Id, secondResult.Id);
+
+        Assert.Equal(firstId, result.Id);
+        Assert.Equal(secondId, secondResult.Id);
     }
 }
